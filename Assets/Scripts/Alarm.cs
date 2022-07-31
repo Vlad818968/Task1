@@ -9,7 +9,7 @@ public class Alarm : MonoBehaviour
     [SerializeField] private UnityEvent _reached;
     [SerializeField] private AudioSource _alarmSound;
 
-    private bool _isEnabled = false;
+    private bool _isSoundEnabled = false;
 
     private void Start()
     {
@@ -18,7 +18,7 @@ public class Alarm : MonoBehaviour
 
     private void Update()
     {
-        if (_isEnabled == true)
+        if (_isSoundEnabled == true)
         {
             _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, 1f, _recoveryRate * Time.deltaTime);
         }
@@ -33,7 +33,7 @@ public class Alarm : MonoBehaviour
         if (collision.TryGetComponent<Crook>(out Crook crook))
         {
             _reached.Invoke();
-            _isEnabled = true;
+            _isSoundEnabled = true;
         }
     }
 
@@ -41,7 +41,7 @@ public class Alarm : MonoBehaviour
     {
         if (collision.TryGetComponent<Crook>(out Crook crook))
         {
-            _isEnabled = false;
+            _isSoundEnabled = false;
         }
     }
 }
