@@ -7,6 +7,7 @@ public class Crook : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private float _speed;
 
+    private HashAnimationNames _animationHashes = new HashAnimationNames();
     private MoveState _state = MoveState.Idle;
     private float _waitingTime = 7;
 
@@ -31,28 +32,20 @@ public class Crook : MonoBehaviour
     public void Run()
     {
         _state = MoveState.Run;
-        _animator.SetBool("IsRun", true);
+        _animator.SetBool(_animationHashes.Run, true);
     }
 
     public void Idle()
     {
         _state = MoveState.Idle;
-        _animator.SetBool("IsRun", false);
+        _animator.SetBool(_animationHashes.Run, false);
     }
 
     private IEnumerator Wait(float waitingTime)
     {
-        while (waitingTime > 0)
-        {
-            waitingTime -= Time.deltaTime;
-
-            if (waitingTime <= 0)
-            {
-                Run();
-            }
-
-            yield return null;
-        }
+        var waitForSeconds = new WaitForSeconds(waitingTime);
+        yield return waitForSeconds;
+        Run();
     }
 
     enum MoveState
