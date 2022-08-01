@@ -8,7 +8,6 @@ public class Crook : MonoBehaviour
     [SerializeField] private float _speed;
 
     private MoveState _state = MoveState.Idle;
-    private bool _isReached = false;
     private float _waitingTime = 7;
 
     private void Start()
@@ -22,22 +21,11 @@ public class Crook : MonoBehaviour
         {
             transform.Translate(_speed * Time.deltaTime, 0, 0);
         }
-
-        if (_isReached == true)
-        {
-            _waitingTime -= Time.deltaTime;
-
-            if (_waitingTime <= 0)
-            {
-                _isReached = false;
-                Run();
-            }
-        }
     }
 
-    public void Reachet()
+    public void StartWait()
     {
-        _isReached = true;
+        StartCoroutine(Wait(_waitingTime));
     }
 
     public void Run()
@@ -50,6 +38,21 @@ public class Crook : MonoBehaviour
     {
         _state = MoveState.Idle;
         _animator.SetBool("IsRun", false);
+    }
+
+    private IEnumerator Wait(float waitingTime)
+    {
+        while (waitingTime > 0)
+        {
+            waitingTime -= Time.deltaTime;
+
+            if (waitingTime <= 0)
+            {
+                Run();
+            }
+
+            yield return null;
+        }
     }
 
     enum MoveState

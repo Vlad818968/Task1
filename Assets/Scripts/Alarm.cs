@@ -1,47 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class Alarm : MonoBehaviour
 {
     [SerializeField] private float _recoveryRate;
-    [SerializeField] private UnityEvent _reached;
     [SerializeField] private AudioSource _alarmSound;
 
-    private bool _isSoundEnabled = false;
+    private Coroutine coroutine;
+    private bool isCoroituneEnabled = false;
 
     private void Start()
     {
         _alarmSound.volume = 0;
     }
 
-    private void Update()
+    public void StartChangeVolumeSound(float targetVolume)
     {
-        if (_isSoundEnabled == true)
+        if (isCoroituneEnabled == true)
         {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, 1f, _recoveryRate * Time.deltaTime);
+            StopCoroutine(coroutine);
         }
-        else
-        {
-            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, 0f, _recoveryRate * Time.deltaTime);
-        }
+
+        coroutine = StartCoroutine(ChangeVolumeSound(targetVolume));
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private IEnumerator ChangeVolumeSound(float targetVolume)
     {
-        if (collision.TryGetComponent<Crook>(out Crook crook))
-        {
-            _reached.Invoke();
-            _isSoundEnabled = true;
-        }
-    }
+        isCoroituneEnabled = true;
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.TryGetComponent<Crook>(out Crook crook))
+        while (_alarmSound.volume != targetVolume)
         {
-            _isSoundEnabled = false;
+            _alarmSound.volume = Mathf.MoveTowards(_alarmSound.volume, targetVolume, _recoveryRate * Time.deltaTime);
+            yield return null;
         }
+
+        if (_alarmSound.volume == 0)
+        {
+            _alarmSound.Stop();
+        }
+
+        isCoroituneEnabled = false;
     }
 }
